@@ -36,12 +36,20 @@ class Tracker:
         The list of active tracks at the current time step.
 
     """
+    _defaults = {
+        "metric_mode": 'cosine',
+        "max_iou_distance": 0.7,
+        "max_age": 30,
+        "n_init": 3,
+        "max_cosine_distance": 0.3,
+        "nn_budget": None
+    }
+    def __init__(self, **kwargs):
+        self.__dict__.updata(_defaults)
+        self.__dict__.updata(kwargs)
 
-    def __init__(self, metric, max_iou_distance=0.7, max_age=30, n_init=3):
-        self.metric = metric
-        self.max_iou_distance = max_iou_distance
-        self.max_age = max_age
-        self.n_init = n_init
+        self.metric = nn_matching.NearestNeighborDistanceMetric(self.metric_mode,
+                                        self.max_cosine_distance, self.nn_budget)
 
         self.kf = kalman_filter.KalmanFilter()
         self.tracks = []

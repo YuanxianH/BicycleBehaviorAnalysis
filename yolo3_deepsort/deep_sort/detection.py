@@ -1,6 +1,6 @@
 # vim: expandtab:ts=4:sw=4
 import numpy as np
-
+from . import preprocessing
 
 class Detection(object):
     """
@@ -48,3 +48,15 @@ class Detection(object):
         ret[:2] += ret[2:] / 2
         ret[2] /= ret[3]
         return ret
+
+def NMS(detections,nms_max_overlap = 1.0):
+    """
+    func:non max suppression
+    tips:boxes should be tlwh format.
+    """
+    boxes = np.array([d.tlwh for d in detections])
+    scores = np.array([d.confidence for d in detections])
+    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
+    detections = [detections[i] for i in indices]
+
+    return detections

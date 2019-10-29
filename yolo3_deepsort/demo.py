@@ -12,9 +12,9 @@ import numpy as np
 from PIL import Image
 from yolo import YOLO
 
-from deep_sort import preprocessing
+# from deep_sort import preprocessing
 # from deep_sort import nn_matching
-from deep_sort.detection import Detection
+from deep_sort.detection import Detection,NMS
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 from deep_sort.detection import Detection as ddet
@@ -23,19 +23,18 @@ warnings.filterwarnings('ignore')
 def main(yolo):
 
    # Definition of the parameters
-    # max_cosine_distance = 0.3
-    # nn_budget = None
     nms_max_overlap = 1.0
+    max_cosine_distance=0.3
+    nn_budget=None
 
    # deep_sort
     model_filename = 'model_data/mars-small128.pb'
     encoder = gdet.create_box_encoder(model_filename,batch_size=1)
 
     # metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
-    tracker = Tracker(metric_mode="cosine",max_cosine_distance=0.3,nn_budget=None)
+    tracker = Tracker(metric_mode="cosine",max_cosine_distance=max_cosine_distance,nn_budget=nn_budget)
 
-    writeVideo_flag = True
-
+    writeVideo_flag = False
     video_capture = cv2.VideoCapture(0)
 
     if writeVideo_flag:
@@ -54,21 +53,14 @@ def main(yolo):
             break
         t1 = time.time()
 
-       # image = Image.fromarray(frame)
-        image = Image.fromarray(frame[...,::-1]) #bgr to rgb
-        boxs,classes,scores = yolo.detect_image(image)
-       # print("box_num",len(boxs))
+        image = Image.fromarray(frame[...,::-1]) # bgr to rgb,CV to PIL
+        boxs,classes,scores = yolo.detect_image(image)# detect
+
         features = encoder(frame,boxs)
 
-        # score to 1.0 here).
         detections = [Detection(bbox, score, feature,class_)
                         for bbox,score,feature,class_ in zip(boxs,scores,features,classes)]
-
-        # Run non-maxima suppression.
-        boxes = np.array([d.tlwh for d in detections])
-        scores = np.array([d.confidence for d in detections])
-        indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-        detections = [detections[i] for i in indices]
+        detections = NMS(detections,nms_max_overlap = nms_max_overlap)# non-max suppression
 
         # Call the tracker
         tracker.predict()
