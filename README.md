@@ -11,12 +11,21 @@
 这一部分内容主要借鉴了[qqwwee/keras-yolo3](https://github.com/qqwweee/keras-yolo3)和[Qidian213/deep_sort_yolov3](https://github.com/Qidian213/deep_sort_yolov3)等人的工作。
 ### 快速使用
 该算法主要有三部分组成：检测器，特征提取器和跟踪器，在代码中即 ***detections***,***encoder***,***tracker***. 检测器负责定位目标位置并确定其类型；特征提取器用来是一个轻型的卷积神经网路，用来提取图像上bbox框出区域的特征，为跟踪器服务；跟踪器则完成跟踪任务，匹配相邻两帧中的相同目标。
-1. 创建 ***encoder*** 和 ***tracker***
+0. 下载权重：
+1. 创建 ***YOLO*** 检测器
+```python
+yolo = YOLO(model_path = 'model_data/yolo.h5',
+            classes_path = 'model_data/DIY_classes.txt',
+            weights_only = True,
+            score = 0.3,
+            iou = 0.3)
+```
+2. 创建 ***encoder*** 和 ***tracker***
 ```python
 encoder = gdet.create_box_encoder('model_data/mars-small128.pb',batch_size=1)
 tracker = Tracker(metric_mode="cosine",max_cosine_distance=max_cosine_distance,nn_budget=nn_budget)#defaultly max_cosine_distance = 0.3, nn_budget = None
 ```
-2. 检测目标位置并提取器特征
+3. 检测目标位置并提取器特征
 ```python
 boxs,classes,scores = yolo.detect_image(image)# detect
 features = encoder(frame,boxs)#encoder features
@@ -24,12 +33,11 @@ detections = [Detection(bbox, score, feature,class_)
                         for bbox,score,feature,class_ in zip(boxs,scores,features,classes)]
 detections = NMS(detections,nms_max_overlap = nms_max_overlap)# non-max suppression
 ```
-3. 更新 ***tracker***
+4. 更新 ***tracker***
 ```python
 tracker.predict()
 tracker.update(detections)#the results are stored in tracker.tracks
 ```
-### 源码介绍
 
 # 参考文献
 <a name="1">[1]</a>: Wojke, Nicolai, Alex Bewley, and Dietrich Paulus. "Simple Online and Realtime Tracking with a Deep Association Metric." Paper presented at the 2017 IEEE International Conference on Image Processing (ICIP), 2017.
