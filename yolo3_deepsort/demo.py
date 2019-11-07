@@ -105,4 +105,9 @@ def main(yolo):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    main(YOLO())
+    yolo = YOLO(model_path = 'model_data/yolo.h5',
+                classes_path = 'model_data/classes_name.txt',
+                weights_only = True,
+                score = 0.3,
+                iou = 0.3)
+    main(yolo)

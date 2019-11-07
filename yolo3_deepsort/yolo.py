@@ -20,16 +20,14 @@ from yolo3.utils import letterbox_image
 
 class YOLO(object):
     def __init__(self,**kwargs):
-        self.model_path = 'model_data/yolo.h5'
+        self.model_path = 'model_data/yolo_BBA.h5'
         self.anchors_path = 'model_data/yolo_anchors.txt'
-        self.classes_path = 'model_data/coco_classes.txt'
-        self.objects_path = 'model_data/objects.txt'
+        self.classes_path = 'model_data/classes_name.txt'
         self.score = 0.5
         self.iou = 0.5
         self.weights_only = False
         self.__dict__.updata(kwargs)
         self.class_names = self._get_classes()
-        self.objects = self._get_objects()
         self.anchors = self._get_anchors()
         self.sess = K.get_session()
         self.model_image_size = (416, 416) # fixed size or (None, None)
@@ -42,13 +40,6 @@ class YOLO(object):
             class_names = f.readlines()
         class_names = [c.strip() for c in class_names]
         return class_names
-
-    def _get_objects(self):
-        objects_path = os.path.expanduser(self.objects_path)
-        with open(objects_path) as f:
-            objects = f.readlines()
-        objects_path = [c.strip() for c in objects]
-        return objects_path
 
     def _get_anchors(self):
         anchors_path = os.path.expanduser(self.anchors_path)
