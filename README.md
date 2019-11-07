@@ -11,6 +11,7 @@
 这一部分内容主要借鉴了[qqwwee/keras-yolo3](https://github.com/qqwweee/keras-yolo3)和[Qidian213/deep_sort_yolov3](https://github.com/Qidian213/deep_sort_yolov3)等人的工作。
 ### 快速使用
 该算法主要有三部分组成：检测器，特征提取器和跟踪器，在代码中即 ***detections***,***encoder***,***tracker***. 检测器负责定位目标位置并确定其类型；特征提取器用来是一个轻型的卷积神经网路，用来提取图像上bbox框出区域的特征，为跟踪器服务；跟踪器则完成跟踪任务，匹配相邻两帧中的相同目标。
+
 0. 下载权重：https://pan.baidu.com/s/1F6N79YmMYZ13TfvtFACz5w, 最好放在 ***model_data*** 文件夹中
 1. 创建 ***YOLO*** 检测器
 ```python
