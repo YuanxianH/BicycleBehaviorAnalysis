@@ -40,7 +40,12 @@ tracker.predict()
 tracker.update(detections)#the results are stored in tracker.tracks
 ```
 
-# 参考文献
+## 其他资源
+1. 测试视频：
+    - [Road Bicycle Race](https://pan.baidu.com/s/1FJ1vEFBoucHJTQBrFEWXOQ)
+    - [New York City 4K](https://pan.baidu.com/s/15lP9ZhgeIrXm0BZqBG1tiQ)
+
+## 参考文献
 <a name="1">[1]</a>: Wojke, Nicolai, Alex Bewley, and Dietrich Paulus. "Simple Online and Realtime Tracking with a Deep Association Metric." Paper presented at the 2017 IEEE International Conference on Image Processing (ICIP), 2017.
 
 <a name="2">[2]</a>: Redmon, Joseph, and Ali Farhadi. "Yolov3: An Incremental Improvement."  2018.
