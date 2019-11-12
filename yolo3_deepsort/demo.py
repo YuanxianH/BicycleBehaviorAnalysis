@@ -36,6 +36,7 @@ def main(yolo):
 
     writeVideo_flag = False
     video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture('model_Data/Road Bicycle Race.mp4')
 
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
@@ -105,7 +106,7 @@ def main(yolo):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    yolo = YOLO(model_path = 'model_data/yolo.h5',
+    yolo = YOLO(model_path = 'model_data/trained_weights_oid_2.h5',
                 classes_path = 'model_data/classes_name.txt',
                 weights_only = True,
                 score = 0.3,
