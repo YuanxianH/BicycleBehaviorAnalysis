@@ -36,7 +36,7 @@ def main(yolo):
 
     writeVideo_flag = False
     video_capture = cv2.VideoCapture(0)
-    video_capture = cv2.VideoCapture('model_Data/Road Bicycle Race.mp4')
+    # video_capture = cv2.VideoCapture('model_Data/Road Bicycle Race.mp4')
 
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
