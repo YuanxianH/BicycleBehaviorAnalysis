@@ -13,20 +13,32 @@ from timeit import default_timer as timer  ### to calculate FPS
 import numpy as np
 from keras import backend as K
 from keras.models import load_model
+from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 
 from yolo3.model import yolo_eval,yolo_body
 from yolo3.utils import letterbox_image
 
 class YOLO(object):
+    _defaults = {
+        'model_path': 'model_data/yolo.h5',
+        'anchors_path': 'model_data/yolo_anchors.txt',
+        'classes_path': 'model_data/classes_name.txt',
+        'score': 0.5,
+        'iou': 0.5,
+        'weights_only': True
+    }
+
+    @classmethod
+    def get_defaults(cls,n):
+        if n in cls._defaults:
+            return cls._defaults[n]
+        else:
+            return "Unrecognized attribute name '" + n + "'"
+
     def __init__(self,**kwargs):
-        self.model_path = 'model_data/yolo_BBA.h5'
-        self.anchors_path = 'model_data/yolo_anchors.txt'
-        self.classes_path = 'model_data/classes_name.txt'
-        self.score = 0.5
-        self.iou = 0.5
-        self.weights_only = False
-        self.__dict__.updata(kwargs)
+        self.__dict__.update(self._defaults)
+        self.__dict__.update(kwargs)
         self.class_names = self._get_classes()
         self.anchors = self._get_anchors()
         self.sess = K.get_session()
@@ -53,9 +65,14 @@ class YOLO(object):
         model_path = os.path.expanduser(self.model_path)
         assert model_path.endswith('.h5'), 'Keras model must be a .h5 file.'
 
-        if weights_only:
-            self.yolo_model = yolo_body()
-        self.yolo_model = load_model(model_path, compile=False)
+        if self.weights_only:
+            image_input = Input(shape=(None, None, 3))
+            num_anchors = len(self.anchors)//3
+            num_classes = len(self.class_names)
+            self.yolo_model = yolo_body(image_input,num_anchors,num_classes)
+            self.yolo_model.load_weights(self.model_path, by_name=True, skip_mismatch=True)
+        else:
+            self.yolo_model = load_model(self.model_path, compile=False)
         print('{} model, anchors, and classes loaded.'.format(model_path))
 
         # Generate colors for drawing bounding boxes.
@@ -104,9 +121,6 @@ class YOLO(object):
 
         for i, c in reversed(list(enumerate(out_classes))):
             predicted_class = self.class_names[c]
-            if predicted_class not in self.objects :
-                continue
-
             box = out_boxes[i]
            # score = out_scores[i]
             x = int(box[1])

@@ -5,6 +5,7 @@ from . import kalman_filter
 from . import linear_assignment
 from . import iou_matching
 from .track import Track
+from . import nn_matching
 
 
 class Tracker:
@@ -44,9 +45,16 @@ class Tracker:
         "max_cosine_distance": 0.3,
         "nn_budget": None
     }
+    @classmethod
+    def get_defaults(cls,n):
+        if n in cls._defaults:
+            return cls._defaults[n]
+        else:
+            return "Unrecognized attribute name '" + n + "'"
+
     def __init__(self, **kwargs):
-        self.__dict__.updata(_defaults)
-        self.__dict__.updata(kwargs)
+        self.__dict__.update(self._defaults)
+        self.__dict__.update(kwargs)
 
         self.metric = nn_matching.NearestNeighborDistanceMetric(self.metric_mode,
                                         self.max_cosine_distance, self.nn_budget)

@@ -1,0 +1,7 @@
+##ignore this file##
+/yolo3_deepsort/model_data/*.h5
+/yolo3_deepsort/model_data/*.mp4
+/yolo3_deepsort/__pycache__/
+/yolo3_deepsort/deep_sort/__pycache__/
+/yolo3_deepsort/tools/__pycache__/
+/yolo3_deepsort/yolo3/__pycache__/
