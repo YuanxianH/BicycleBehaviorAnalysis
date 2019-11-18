@@ -12,15 +12,15 @@ import numpy as np
 from PIL import Image
 from yolo import YOLO
 
-# from deep_sort import preprocessing
-# from deep_sort import nn_matching
+# from deep_sort.preprocessing import non_max_suppression as NMS
 from deep_sort.detection import Detection,NMS
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
+from tools.plot_utils import draw_one_box as draw_box
 from deep_sort.detection import Detection as ddet
 warnings.filterwarnings('ignore')
 
-def main(yolo):
+def track_video(yolo,video_handle = 'model_data/Crossroad.mp4'):
 
    # Definition of the parameters
     nms_max_overlap = 1.0
@@ -35,8 +35,7 @@ def main(yolo):
     tracker = Tracker(metric_mode="cosine",max_cosine_distance=max_cosine_distance,nn_budget=nn_budget)
 
     writeVideo_flag = False
-    video_capture = cv2.VideoCapture(0)
-    # video_capture = cv2.VideoCapture('model_Data/Road Bicycle Race.mp4')
+    video_capture = cv2.VideoCapture(video_handle)
 
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
@@ -55,13 +54,11 @@ def main(yolo):
         t1 = time.time()
 
         image = Image.fromarray(frame[...,::-1]) # bgr to rgb,CV to PIL
-        boxs,classes,scores = yolo.detect_image(image)# detect
+        boxes,classes,scores = yolo.detect_image(image)# detect
 
-        features = encoder(frame,boxs)
-
+        features = encoder(frame,boxes)
         detections = [Detection(bbox, score, feature,class_)
-                        for bbox,score,feature,class_ in zip(boxs,scores,features,classes)]
-        detections = NMS(detections,nms_max_overlap = nms_max_overlap)# non-max suppression
+                        for bbox,score,feature,class_ in zip(boxes,scores,features,classes)]
 
         # Call the tracker
         tracker.predict()
@@ -71,16 +68,10 @@ def main(yolo):
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue
             bbox = track.to_tlbr()
-            cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-            cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
-            cv2.putText(frame,classes[i],(int(bbox[0])+10, int(bbox[1])),0, 5e-3 * 200, (0,0,255),2)
 
-
-        for det in detections:
-            bbox = det.to_tlbr()
-            cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
-
-        cv2.imshow('demo', frame)
+            image = draw_box(image,bbox,track.track_id,track.object_class,yolo.colors[yolo.class_names.index(track.object_class)])
+        img_show = cv2.resize(np.asarray(image),(1000,600))
+        cv2.imshow('demo', img_show)
 
         if writeVideo_flag:
             # save a frame
@@ -106,9 +97,10 @@ def main(yolo):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    yolo = YOLO(model_path = 'model_data/trained_weights_oid_2.h5',
+    yolo = YOLO(model_path = 'model_data/trained_weights_coco.h5',
                 classes_path = 'model_data/classes_name.txt',
                 weights_only = True,
                 score = 0.3,
                 iou = 0.3)
-    main(yolo)
+    video_handle = 'model_data/Crossroad.mp4'
+    track_video(yolo,video_handle)

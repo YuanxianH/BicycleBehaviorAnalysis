@@ -12,7 +12,7 @@
 ### 快速使用
 该算法主要有三部分组成：检测器，特征提取器和跟踪器，在代码中即 ***detections***,***encoder***,***tracker***. 检测器负责定位目标位置并确定其类型；特征提取器用来是一个轻型的卷积神经网路，用来提取图像上bbox框出区域的特征，为跟踪器服务；跟踪器则完成跟踪任务，匹配相邻两帧中的相同目标。
 
-0. 下载权重：https://pan.baidu.com/s/1F6N79YmMYZ13TfvtFACz5w, 最好放在 ***model_data*** 文件夹中
+0. 下载权重：https://pan.baidu.com/s/1pRN6HVifNTISnzZlREzZKg, 最好放在 ***model_data*** 文件夹中
 1. 创建 ***YOLO*** 检测器
 ```python
 yolo = YOLO(model_path = 'model_data/yolo_BBA.h5',
@@ -28,11 +28,10 @@ tracker = Tracker(metric_mode="cosine",max_cosine_distance=max_cosine_distance,n
 ```
 3. 检测目标位置并提取器特征
 ```python
-boxs,classes,scores = yolo.detect_image(image)# detect
+boxs,classes,scores = yolo.detect_image(image)# detect image
 features = encoder(frame,boxs)#encoder features
 detections = [Detection(bbox, score, feature,class_)
-                        for bbox,score,feature,class_ in zip(boxs,scores,features,classes)]
-detections = NMS(detections,nms_max_overlap = nms_max_overlap)# non-max suppression
+                        for bbox,score,feature,class_ in zip(boxs,scores,features,classes)] # create dectectors
 ```
 4. 更新 ***tracker***
 ```python
