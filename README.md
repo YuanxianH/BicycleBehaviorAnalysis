@@ -9,6 +9,10 @@
 我们采用 TBD(Tracking by Detection) 的方法在单目视频中取检测跟踪自行车的轨迹.我们使用 **DeepSORT**<sup>[[1]](#1)</sup>作为跟踪器， **YOLOv3**<sup>[[2]](#2)</sup>作为检测器。
 其中，YOLOv3经过了迁移学习，类别的输出次序依次为: ***person***,***bicycle***,***car***,***motorcycle***,***bus***,***train***,***truck***.值得注意的是，虽然本项目的研究对象是自行车，但为了扩大本项目的应用范围，提高其实用性，故在训练时把人、摩托车、汽车等常见的道路使用者也纳为检测对象。
 这一部分内容主要借鉴了[qqwwee/keras-yolo3](https://github.com/qqwweee/keras-yolo3)和[Qidian213/deep_sort_yolov3](https://github.com/Qidian213/deep_sort_yolov3)等人的工作。
+### 主要环境配置
+- python 3
+- tensorflow 1.9.0
+- keras 2.2.4
 ### 快速使用
 该算法主要有三部分组成：检测器，特征提取器和跟踪器，在代码中即 ***detections***,***encoder***,***tracker***. 检测器负责定位目标位置并确定其类型；特征提取器用来是一个轻型的卷积神经网路，用来提取图像上bbox框出区域的特征，为跟踪器服务；跟踪器则完成跟踪任务，匹配相邻两帧中的相同目标。
 

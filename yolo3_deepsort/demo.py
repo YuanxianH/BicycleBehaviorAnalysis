@@ -70,12 +70,12 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4'):
             bbox = track.to_tlbr()
 
             image = draw_box(image,bbox,track.track_id,track.object_class,yolo.colors[yolo.class_names.index(track.object_class)])
-        img_show = cv2.resize(np.asarray(image),(1000,600))
+        img_show = np.asarray(image)
         cv2.imshow('demo', img_show)
 
         if writeVideo_flag:
             # save a frame
-            out.write(frame)
+            out.write(img_show)
             frame_index = frame_index + 1
             list_file.write(str(frame_index)+' ')
             if len(boxs) != 0:
