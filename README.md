@@ -43,10 +43,10 @@ tracker.predict()
 tracker.update(detections)#the results are stored in tracker.tracks
 ```
 5. 三维重建
-feature.py运用SIFT进行特征点匹配过程 
-ca.py对视频进行图像序列化 
-structure.py对两点进行线性三角形法进行求点 
-camara.py是摄像机的一些参数设置
+-feature.py运用SIFT进行特征点匹配过程 
+-ca.py对视频进行图像序列化 
+-structure.py对两点进行线性三角形法进行求点 
+-camara.py是摄像机的一些参数设置
 
 ## 其他资源
 1. 测试视频：
