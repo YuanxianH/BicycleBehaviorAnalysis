@@ -42,8 +42,9 @@ class Tracker:
         "max_iou_distance": 0.7,
         "max_age": 30,
         "n_init": 3,
-        "max_cosine_distance": 0.3,
-        "nn_budget": None
+        "max_distance": 0.3,
+        "nn_budget": None,
+        "lambda0":None
     }
     @classmethod
     def get_defaults(cls,n):
@@ -57,7 +58,7 @@ class Tracker:
         self.__dict__.update(kwargs)
 
         self.metric = nn_matching.NearestNeighborDistanceMetric(self.metric_mode,
-                                        self.max_cosine_distance, self.nn_budget)
+                                        self.max_distance, self.lambda0, self.nn_budget)
 
         self.kf = kalman_filter.KalmanFilter()
         self.tracks = []
