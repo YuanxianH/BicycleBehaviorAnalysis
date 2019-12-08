@@ -20,8 +20,16 @@ from tools.plot_utils import draw_one_box as draw_box
 from deep_sort.detection import Detection as ddet
 warnings.filterwarnings('ignore')
 
-def track_video(yolo,video_handle = 'model_data/Crossroad.mp4'):
-
+def track_video(yolo,video_handle = 'model_data/Crossroad.mp4', det_only = False):
+    '''Track objects in a video
+    Parameters:
+    -----------
+        yolo: a class define YOLO algorithm
+        video_handle: 0 or video path
+    Return:
+    -------
+        None
+    '''
    # Definition of the parameters
     nms_max_overlap = 1.0
     max_distance=0.3
@@ -58,6 +66,7 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4'):
         image = Image.fromarray(frame[...,::-1]) # bgr to rgb,CV to PIL
         boxes,classes,scores = yolo.detect_image(image)# detect
 
+        # detect and track
         features = encoder(frame,boxes)
         detections = [Detection(bbox, score, feature,class_)
                         for bbox,score,feature,class_ in zip(boxes,scores,features,classes)]
@@ -66,12 +75,19 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4'):
         tracker.predict()
         tracker.update(detections)
 
-        for i,track in enumerate(tracker.tracks):
-            if not track.is_confirmed() or track.time_since_update > 1:
-                continue
-            bbox = track.to_tlbr()
-
-            image = draw_box(image,bbox,track.track_id,track.object_class,yolo.colors[yolo.class_names.index(track.object_class)])
+        # detect only, not to track
+        if det_only:
+            for bbox,cat in zip(boxes,classes):
+                color = yolo.colors[yolo.class_names.index(cat)]
+                bbox = np.array(bbox)
+                bbox[2:] = bbox[:2] + bbox[2:]#tlwh to tlbr
+                image = draw_box(image,bbox,' ',cat,color)
+        else:
+            for i,track in enumerate(tracker.tracks):
+                if not track.is_confirmed() or track.time_since_update > 1:
+                    continue
+                bbox = track.to_tlbr()
+                image = draw_box(image,bbox,track.track_id,track.object_class,yolo.colors[yolo.class_names.index(track.object_class)])
         img_show = np.asarray(image)
         cv2.imshow('demo', img_show)
 
@@ -105,4 +121,4 @@ if __name__ == '__main__':
                 score = 0.3,
                 iou = 0.3)
     video_handle = 'model_data/Crossroad.mp4'
-    track_video(yolo,video_handle)
+    track_video(yolo,video_handle,det_only = True)
