@@ -24,7 +24,8 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4'):
 
    # Definition of the parameters
     nms_max_overlap = 1.0
-    max_cosine_distance=0.3
+    max_distance=0.3
+    lambda0 = 0.1
     nn_budget=None
 
    # deep_sort
@@ -32,7 +33,8 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4'):
     encoder = gdet.create_box_encoder(model_filename,batch_size=1)
 
     # metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
-    tracker = Tracker(metric_mode="cosine",max_cosine_distance=max_cosine_distance,nn_budget=nn_budget)
+    tracker = Tracker(metric_mode="cosine",max_cosine_distance=max_distance,
+                      lambda0 = lambda0,nn_budget=nn_budget)
 
     writeVideo_flag = False
     video_capture = cv2.VideoCapture(video_handle)

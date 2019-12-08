@@ -98,6 +98,28 @@ def _nn_cosine_distance(x, y):
     distances = _cosine_distance(x, y)
     return distances.min(axis=0)
 
+def _nn_combine_distance(x,y,lambda0):
+    '''Combine the euclidean distance and cosine distance by linear weighting
+
+    Parameters
+    ----------
+    x : ndarray
+        A matrix of N row-vectors (sample points).
+    y : ndarray
+        A matrix of M row-vectors (query points).
+    lambda0 : float(0~1)
+        The weight before motion vector
+
+    Returns
+    -------
+    ndarray
+    A vector of length M that contains for each entry in `y` the
+    smallest cosine distance to a sample in `x`.
+
+    '''
+    d1 = _nn_euclidean_distance(x,y)
+    d2 = _nn_cosine_distance(x,y)
+    return d1*lambda0 + d2*(1-lambda0)
 
 class NearestNeighborDistanceMetric(object):
     """
@@ -123,13 +145,16 @@ class NearestNeighborDistanceMetric(object):
 
     """
 
-    def __init__(self, metric, matching_threshold, budget=None):
-
-
+    def __init__(self, metric, matching_threshold, lambda0=None, budget=None):
         if metric == "euclidean":
             self._metric = _nn_euclidean_distance
         elif metric == "cosine":
             self._metric = _nn_cosine_distance
+        elif metric == "combine":
+            if lambda0 is None:
+                raise ValueError(
+                "Please input lambda0(the weight parameter) when using 'combine' metric")
+            self._metric = lambda x,y: _nn_combine_distance(x,y,lambda0)
         else:
             raise ValueError(
                 "Invalid metric; must be either 'euclidean' or 'cosine'")
