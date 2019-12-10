@@ -3,11 +3,12 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import cv2
 import  os
-from camera import Camera
+# from camera import Camera
 import structure
 import processor
 import features
-import ca
+# import ca
+
 # Download images from http://www.robots.ox.ac.uk/~vgg/data/data-mview.html
 #SUPTITLE = fig.suptitle('3D reconstructed', fontsize=16)
 
@@ -69,13 +70,13 @@ def read_directory(img1_path,img2_path):
         points1 = processor.cart2hom(pts1)
         points2 = processor.cart2hom(pts2)
 
-        fig, ax = plt.subplots(1, 2)
+        fig, ax = plt.subplots(2, 1)
         ax[0].autoscale_view('tight')
         ax[0].imshow(cv2.cvtColor(img1, cv2.COLOR_BGR2RGB))
-        ax[0].plot(points1[0], points1[1], 'r.')
+        ax[0].plot(points1[0], points1[1], 'ro', markerfacecolor  ='none',markersize=2)
         ax[1].autoscale_view('tight')
         ax[1].imshow(cv2.cvtColor(img2, cv2.COLOR_BGR2RGB))
-        ax[1].plot(points2[0], points2[1], 'r.')
+        ax[1].plot(points2[0], points2[1], 'ro', markerfacecolor  ='none',markersize=2)
         fig.show()
 
         height, width, ch = img1.shape
@@ -117,7 +118,7 @@ def read_directory(img1_path,img2_path):
     P2 = np.linalg.inv(np.vstack([P2s[ind], [0, 0, 0, 1]]))[:3, :4]
     #tripoints3d = structure.reconstruct_points(points1n, points2n, P1, P2)
     tripoints3d = structure.linear_triangulation(points1n, points2n, P1, P2)
-    print('3d ax',tripoints3d)
+    print('3d ax:\n',tripoints3d)
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     ax.plot(tripoints3d[0], tripoints3d[1], tripoints3d[2], 'b.')
@@ -126,6 +127,9 @@ def read_directory(img1_path,img2_path):
     ax.set_zlabel('z axis')
     ax.view_init(elev=135, azim=90)
     plt.show()
+
 if __name__ == "__main__":
-    read_directory("G:\\data_stereo_flow\\training\colored_0\\000000_10.png",
-                    "G:\\data_stereo_flow\\training\colored_1\\000000_10.png")
+    read_directory("G:\\data_stereo_flow\\training\colored_0\\000180_10.png",
+                   "G:\\data_stereo_flow\\training\colored_1\\000180_10.png")
+    # read_directory(r"img1\pencap.png",
+    #                r"img2\pencap.png")
