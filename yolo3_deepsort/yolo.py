@@ -16,15 +16,15 @@ from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 
-from . import yolo3
-from yolo3.model import yolo_eval,yolo_body
-from yolo3.utils import letterbox_image
+from .yolo3.model import yolo_eval,yolo_body
+from .yolo3.utils import letterbox_image
 
 class YOLO(object):
+    _current_path = os.path.dirname(__file__)
     _defaults = {
-        'model_path': 'model_data/yolo.h5',
-        'anchors_path': 'model_data/yolo_anchors.txt',
-        'classes_path': 'model_data/classes_name.txt',
+        'model_path': _current_path + '/model_data/yolo.h5',
+        'anchors_path': _current_path + '/model_data/yolo_anchors.txt',
+        'classes_path': _current_path + '/model_data/classes_name.txt',
         'score': 0.5,
         'iou': 0.5,
         'weights_only': True
