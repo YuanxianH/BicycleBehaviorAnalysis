@@ -16,6 +16,7 @@ from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 
+from . import yolo3
 from yolo3.model import yolo_eval,yolo_body
 from yolo3.utils import letterbox_image
 

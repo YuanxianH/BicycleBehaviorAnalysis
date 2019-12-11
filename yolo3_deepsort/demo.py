@@ -12,8 +12,7 @@ import numpy as np
 from PIL import Image
 from yolo import YOLO
 
-# from deep_sort.preprocessing import non_max_suppression as NMS
-from deep_sort.detection import Detection,NMS
+from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 from tools.plot_utils import draw_one_box as draw_box
