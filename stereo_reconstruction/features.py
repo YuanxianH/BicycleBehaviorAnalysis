@@ -2,13 +2,28 @@ import cv2
 import numpy as np
 
 
-def find_correspondence_points(img1, img2):
-    sift = cv2.xfeatures2d.SIFT_create()
+def find_correspondence_points(img1, img2, feature='SURF',limit = 9999):
+    '''Find Correspondence Points
+    Parameters:
+    ==========
+    img1,img2 -> two similar images
+    feature -> choose the feature used(SIFT or SURF)
+    limit -> the limit number of feature points
+
+    Return:
+    ======
+    pts1,pts2 -> array(2 x m) saved catesian coordination
+    '''
+    assert (feature=='SURF' or feature=='SIFT'),'Only support SURF and SIFT feature'
+    if feature == 'SIFT':
+        fea = cv2.xfeatures2d.SIFT_create(limit)
+    elif feature == 'SURF':
+        fea = cv2.xfeatures2d.SURF_create(limit)
 
     # find the keypoints and descriptors with SIFT
-    kp1, des1 = sift.detectAndCompute(
+    kp1, des1 = fea.detectAndCompute(
         cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY), None)
-    kp2, des2 = sift.detectAndCompute(
+    kp2, des2 = fea.detectAndCompute(
         cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY), None)
 
     # Find point matches

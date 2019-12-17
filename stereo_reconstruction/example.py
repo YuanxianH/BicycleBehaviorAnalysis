@@ -62,11 +62,11 @@ import features
 
     return points1, points2, intrinsic
 '''
-def read_directory(img1_path,img2_path):
+def read_directory(img1_path,img2_path,feature='SURF',limit = 9999):
     def dino():
         img1 = cv2.imread(img1_path)
         img2 = cv2.imread(img2_path)
-        pts1, pts2 = features.find_correspondence_points(img1, img2)
+        pts1, pts2 = features.find_correspondence_points(img1, img2,feature,limit)
         points1 = processor.cart2hom(pts1)
         points2 = processor.cart2hom(pts2)
 
@@ -92,7 +92,7 @@ def read_directory(img1_path,img2_path):
     # Calculate essential matrix with 2d points.
     # Result will be up to a scale
     # First, normalize points
-    points1n = np.dot(np.linalg.inv(intrinsic), points1)
+    points1n = np.dot(np.linalg.inv(intrinsic), points1)#由像平面坐标转换为像空间坐标
     points2n = np.dot(np.linalg.inv(intrinsic), points2)
     E = structure.compute_essential_normalized(points1n, points2n)
     print('Computed essential matrix:', (-E / E[0][1]))
@@ -100,7 +100,7 @@ def read_directory(img1_path,img2_path):
     # Given we are at camera 1, calculate the parameters for camera 2
     # Using the essential matrix returns 4 possible camera paramters
     P1 = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]])
-    P2s = structure.compute_P_from_essential(E)
+    P2s = structure.compute_P_from_essential(E)#由根据基本矩阵E和P1计算P2
 
     ind = -1
     for i, P2 in enumerate(P2s):
@@ -130,6 +130,11 @@ def read_directory(img1_path,img2_path):
 
 if __name__ == "__main__":
     read_directory("G:\\data_stereo_flow\\training\colored_0\\000180_10.png",
-                   "G:\\data_stereo_flow\\training\colored_1\\000180_10.png")
+                   "G:\\data_stereo_flow\\training\colored_1\\000180_10.png",
+                   feature='SURF')
+    # read_directory("G:\\data_stereo_flow\\training\colored_0\\000180_10.png",
+    #               "G:\\data_stereo_flow\\training\colored_1\\000180_10.png",
+    #               feature='SIFT')
     # read_directory(r"img1\pencap.png",
-    #                r"img2\pencap.png")
+    #                r"img2\pencap.png",
+    #                feature='SURF')

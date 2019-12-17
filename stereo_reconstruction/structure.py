@@ -46,7 +46,7 @@ def linear_triangulation(p1, p2, m1, m2):
         ])
 
         _, _, V = np.linalg.svd(A)
-        X = V[-1, :4]
+        X = V[-1, :4]#最小奇异值对应的列向量就是方程的解
         res[:, i] = X / X[3]
 
     return res

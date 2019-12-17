@@ -10,4 +10,3 @@
 /stereo_reconstruction/img2/
 /stereo_reconstruction/*.ipynb
 /stereo_reconstruction/.ipynb_checkpoints/
-*.ipynb
