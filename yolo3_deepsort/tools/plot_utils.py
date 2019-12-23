@@ -5,7 +5,7 @@ import numpy as np
 def draw_one_box(img,bbox,id,cat,color):
     '''
     img: PIL format
-    bbox: (top,left,bottom,right)
+    bbox: (left,top,right,bottom)
     id: identity of the object
     cat: catagory,string
     color: (r,g,b)
