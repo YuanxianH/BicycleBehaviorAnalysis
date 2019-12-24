@@ -2,7 +2,7 @@ from PIL import Image,ImageFont,ImageDraw
 import colorsys
 import numpy as np
 
-def draw_one_box(img,bbox,id,cat,color):
+def draw_one_box(img,bbox,id,cat,color,fontsize):
     '''
     img: PIL format
     bbox: (left,top,right,bottom)
@@ -18,8 +18,9 @@ def draw_one_box(img,bbox,id,cat,color):
     right = min(img.size[0], np.floor(right + 0.5).astype('int32'))
 
     label = 'No.{}:{}'.format(id,cat)
+    font = ImageFont.truetype(r'C:\Users\System-Pc\Desktop\arial.ttf', fontsize)
     draw = ImageDraw.Draw(img)
-    label_size = draw.textsize(label)
+    label_size = draw.textsize(label,font)
 
     if top-label_size[1]>=0:
         text_origin = np.array([left, top - label_size[1]])
@@ -31,6 +32,6 @@ def draw_one_box(img,bbox,id,cat,color):
                         outline=color)
     draw.rectangle([tuple(text_origin), tuple(text_origin + label_size)],
           fill=tuple(color))
-    draw.text(list(text_origin),label,fill=(0,0,0))
+    draw.text(list(text_origin),label,font=font, fill=(0,0,0))
 
     return img

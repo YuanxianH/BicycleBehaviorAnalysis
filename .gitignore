@@ -11,4 +11,5 @@
 /stereo_reconstruction/*.ipynb
 #/stereo_reconstruction/.ipynb_checkpoints/
 */.ipynb_checkpoints/*
-/.ipynb_checkpoints/demo-checkpoint.ipynb
+.ipynb_checkpoints
+result

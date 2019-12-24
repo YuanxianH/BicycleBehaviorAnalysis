@@ -31,9 +31,9 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4', det_only = False
     '''
    # Definition of the parameters
     nms_max_overlap = 1.0
-    max_distance=0.3
+    max_distance = 0.3
     lambda0 = 0.1
-    nn_budget=None
+    nn_budget = None
 
    # deep_sort
     model_filename = 'model_data/mars-small128.pb'
@@ -65,7 +65,7 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4', det_only = False
         image = Image.fromarray(frame[...,::-1]) # bgr to rgb,CV to PIL
         boxes,classes,scores = yolo.detect_image(image)# detect
 
-        # detect and track
+        # encoder features
         features = encoder(frame,boxes)
         detections = [Detection(bbox, score, feature,class_)
                         for bbox,score,feature,class_ in zip(boxes,scores,features,classes)]
