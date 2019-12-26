@@ -64,6 +64,8 @@ def get_patch_by_box(img,box):
     '''
     l,t,w,h = [int(i) for i in box]
     r = l + w;b = t + h
+    t = max(0,t); l = max(0,l)
+    b = min(img.shape[0],b); r = min(img.shape[1],r)
     template = img[t:b,l:r,:]
     return template
 
@@ -91,9 +93,10 @@ def match_images(img1,img2,box):
     # ts,bs,rs,ls = np.array([t,b,r,l],dtype='int32')
     # over screen
     ts = max(0,ts);ls = max(0,ls)
-    bs = min(img2.shape[0]-1,bs); rs = min(img2.shape[1]-1,rs)
+    bs = min(img2.shape[0],bs); rs = min(img2.shape[1],rs)
 
     search_patch = img2[ts:bs,ls:rs,:]#search around the template
+
     res = cv2.matchTemplate(search_patch,template,cv2.TM_CCOEFF)
     min_val,max_val,min_loc,max_loc = cv2.minMaxLoc(res)
 
