@@ -2,7 +2,7 @@ from PIL import Image,ImageFont,ImageDraw
 import colorsys
 import numpy as np
 
-def draw_one_box(img,bbox,id,cat,color,fontsize):
+def draw_one_box(img,bbox,id,cat,color,fontsize=10):
     '''
     img: PIL format
     bbox: (left,top,right,bottom)
