@@ -95,6 +95,16 @@ class YOLO(object):
         return boxes, scores, classes
 
     def detect_image(self, image):
+        '''
+        Parameters:
+        ==========
+        image:PIL
+        Return:
+        ==========
+        return_boxs: ltwh(xywh)
+        return_classes：string
+        return_scores: float
+        '''
         if self.is_fixed_size:
             assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
             assert self.model_image_size[1]%32 == 0, 'Multiples of 32 required'

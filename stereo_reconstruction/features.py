@@ -56,7 +56,7 @@ def get_patch_by_box(img,box):
     parameters:
     ==========
     img1: image in array format
-    box: bouding box(x,y,w,h)
+    box: bouding box(l,t,w,h)
 
     returns:
     =======
@@ -69,7 +69,7 @@ def get_patch_by_box(img,box):
     template = img[t:b,l:r,:]
     return template
 
-def match_images(img1,img2,box):
+def match_images(img1,img2,box,offset=(-400,-50,0,50),method=cv2.TM_CCOEFF_NORMED):
     '''matching template around the box in another image
     parameters:
     ==========
@@ -81,23 +81,26 @@ def match_images(img1,img2,box):
     =======
     res: the result of matching template
     search_patch: the search range in the image
-    box_matched: left,top,right,bottom,the coordination of the searched patch
+    box_matched: (left,top,right,bottom),the coordination of the searched patch
     '''
 
     l,t,w,h = box
     r = l + w;b = t + h
     template = get_patch_by_box(img1,box)
+    # print("t,b,l,r",(t,b,l,r))
 
     # strict searching range
-    ts,bs,rs,ls = np.array([t,b,r,l],dtype='int32') + np.array([-h/2,h/2.,w/2.,-w/2.],dtype='int32')
-    # ts,bs,rs,ls = np.array([t,b,r,l],dtype='int32')
+    ls,ts,rs,bs = np.array([l,t,r,b],dtype='int32') + \
+                            np.array(offset,dtype='int32')
+    # print("ts,bs,rs,ls",ts,bs,rs,ls)
     # over screen
     ts = max(0,ts);ls = max(0,ls)
     bs = min(img2.shape[0],bs); rs = min(img2.shape[1],rs)
+    # print("ts,bs,ls,rs",(ts,bs,ls,rs))
 
     search_patch = img2[ts:bs,ls:rs,:]#search around the template
 
-    res = cv2.matchTemplate(search_patch,template,cv2.TM_CCOEFF)
+    res = cv2.matchTemplate(search_patch,template,method)
     min_val,max_val,min_loc,max_loc = cv2.minMaxLoc(res)
 
     # the matched patch's location
