@@ -76,6 +76,7 @@ def match_images(img1,img2,box,offset=(-400,-50,0,50),method=cv2.TM_CCOEFF_NORME
     img1: image has template
     img2: searching in img2
     box: bouding box(x,y,w,h)
+    offset:(l,t,r,b)
 
     returns:
     =======

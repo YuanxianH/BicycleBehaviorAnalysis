@@ -22,6 +22,10 @@ class Tracker:
         Number of consecutive detections before the track is confirmed. The
         track state is set to `Deleted` if a miss occurs within the first
         `n_init` frames.
+    lambda0 : float(0~1)
+        The weight of the Euclidean distance with respect to the cosine distance.
+        If lambda0 = 1, the tracker degrade to SORT. And if lambda0 = 0,
+        the tracker only uses the appearance information.
 
     Attributes
     ----------
@@ -44,7 +48,7 @@ class Tracker:
         "n_init": 3,
         "max_distance": 0.3,
         "nn_budget": None,
-        "lambda0":None
+        "lambda0": None
     }
     @classmethod
     def get_defaults(cls,n):
