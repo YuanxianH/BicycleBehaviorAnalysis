@@ -26,11 +26,14 @@ class Detection(object):
 
     """
 
-    def __init__(self, tlwh, confidence, feature,object_class):
+    def __init__(self, tlwh, confidence, object_class, feature=None):
         self.tlwh = np.asarray(tlwh, dtype=np.float)
         self.confidence = float(confidence)
-        self.feature = np.asarray(feature, dtype=np.float32)
         self.object_class = object_class
+        if feature is not None:
+            self.feature = np.asarray(feature, dtype=np.float32)
+        else:
+            self.feature = []
 
     def to_tlbr(self):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
@@ -48,15 +51,3 @@ class Detection(object):
         ret[:2] += ret[2:] / 2
         ret[2] /= ret[3]
         return ret
-
-def NMS(detections,nms_max_overlap = 1.0):
-    """
-    func:non max suppression
-    tips:boxes should be tlwh format.
-    """
-    boxes = np.array([d.tlwh for d in detections])
-    scores = np.array([d.confidence for d in detections])
-    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-    detections = [detections[i] for i in indices]
-
-    return detections
