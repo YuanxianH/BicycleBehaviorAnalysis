@@ -60,6 +60,8 @@ class Track:
     features : List[ndarray]
         A cache of features. On each measurement update, the associated feature
         vector is added to this list.
+    XYZ:
+    frame_begin:
 
     """
 

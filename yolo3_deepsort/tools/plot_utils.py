@@ -1,6 +1,7 @@
 from PIL import Image,ImageFont,ImageDraw
 import colorsys
 import numpy as np
+import matplotlib.font_manager as fm # to create font
 
 def draw_one_box(img,bbox,id,cat,color,fontsize=10):
     '''
@@ -18,7 +19,9 @@ def draw_one_box(img,bbox,id,cat,color,fontsize=10):
     right = min(img.size[0], np.floor(right + 0.5).astype('int32'))
 
     label = 'No.{}:{}'.format(id,cat)
-    font = ImageFont.truetype(r'C:\Users\System-Pc\Desktop\arial.ttf', fontsize)
+    font = ImageFont.truetype(fm.findfont(fm.FontProperties(family='DejaVu Sans')),fontsize)
+    # font = ImageFont.truetype("arial.pil",size = fontsize)
+    # font = ImageFont.truetype(r'C:\Users\System-Pc\Desktop\arial.ttf', fontsize)
     draw = ImageDraw.Draw(img)
     label_size = draw.textsize(label,font)
 
