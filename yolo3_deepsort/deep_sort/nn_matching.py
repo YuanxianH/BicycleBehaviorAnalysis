@@ -168,7 +168,7 @@ class NearestNeighborDistanceMetric(object):
         Parameters
         ----------
         features : ndarray
-            An NxM matrix of N features of dimensionality M.
+            An NxM matrix of N track's features of dimensionality M.
         targets : ndarray
             An integer array of associated target identities.
         active_targets : List[int]

@@ -1,5 +1,5 @@
 # vim: expandtab:ts=4:sw=4
-
+import numpy as np
 
 class TrackState:
     """
@@ -40,6 +40,9 @@ class Track:
     feature : Optional[ndarray]
         Feature vector of the detection this track originates from. If not None,
         this feature is added to the `features` cache.
+    object_class: string
+    frame_begin: int
+        The frame number when initialize
 
     Attributes
     ----------
@@ -60,9 +63,12 @@ class Track:
     features : List[ndarray]
         A cache of features. On each measurement update, the associated feature
         vector is added to this list.
-    XYZ:
-    frame_begin:
-
+    XYZ_array: (3,n) numpy array
+        The 3d track of the object
+    frame _array:
+        Record the frame number when update
+    cat_history:
+        Record the category of the object
     """
 
     def __init__(self, mean, covariance, track_id, n_init, max_age,
@@ -83,6 +89,13 @@ class Track:
         self._max_age = max_age
 
         self.object_class = object_class
+        self.cat_history = []
+        self.cat_bufffer = 25 # the length of car_history is below than 25
+
+        self.XYZ_array = []
+        self.box_array = []
+        self.frame_array = []
+
 
     def to_tlwh(self):
         """Get current position in bounding box format `(top left x, top left y,
@@ -148,6 +161,18 @@ class Track:
         self.time_since_update = 0
         if self.state == TrackState.Tentative and self.hits >= self._n_init:
             self.state = TrackState.Confirmed
+
+        self.frame_array.append(detection.frame)
+
+        self.cat_history.append(detection.object_class)
+        self.cat_history = self.cat_history[-self.cat_bufffer:]
+        self.object_class = max(self.cat_history, key=self.cat_history.count)
+
+        self.box_array.append(self.mean)
+        if len(self.XYZ_array) == 0:
+            self.XYZ_array = detection.XYZ
+        else:
+            self.XYZ_array = np.hstack([self.XYZ_array,detection.XYZ])
 
     def mark_missed(self):
         """Mark this track as missed (no association at the current time step).

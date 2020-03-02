@@ -10,14 +10,23 @@ import sys
 import cv2
 import numpy as np
 from PIL import Image
-from yolo import YOLO
+from .yolo import YOLO
 
-from deep_sort.detection import Detection
-from deep_sort.tracker import Tracker
-from tools import generate_detections as gdet
-from tools.plot_utils import draw_one_box as draw_box
-from deep_sort.detection import Detection as ddet
+# set config to initialize cudnn
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
+config = ConfigProto()
+config.gpu_options.allow_growth = True
+session = InteractiveSession(config=config)
+
+from .deep_sort.detection import Detection
+from .deep_sort.tracker import Tracker
+from .tools import generate_detections as gdet
+from .tools.plot_utils import draw_one_box as draw_box
+from .deep_sort.detection import Detection as ddet
 warnings.filterwarnings('ignore')
+
+_current_path = os.path.dirname(__file__)
 
 def track_video(yolo,video_handle = 'model_data/Crossroad.mp4', det_only = False):
     '''Track objects in a video
@@ -36,7 +45,7 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4', det_only = False
     nn_budget = None
 
    # deep_sort
-    model_filename = 'model_data/mars-small128.pb'
+    model_filename = _current_path+'/model_data/mars-small128.pb'
     encoder = gdet.create_box_encoder(model_filename,batch_size=1)
 
     # metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
@@ -67,8 +76,8 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4', det_only = False
 
         # encoder features
         features = encoder(frame,boxes)
-        detections = [Detection(bbox, score, feature,class_)
-                        for bbox,score,feature,class_ in zip(boxes,scores,features,classes)]
+        detections = [Detection(bbox, score, class_, feature)
+                        for bbox,score,class_,feature in zip(boxes,scores,classes,features)]
 
         # Call the tracker
         tracker.predict()
@@ -113,11 +122,11 @@ def track_video(yolo,video_handle = 'model_data/Crossroad.mp4', det_only = False
         list_file.close()
     cv2.destroyAllWindows()
 
-if __name__ == '__main__':
-    yolo = YOLO(model_path = 'model_data/trained_weights_coco.h5',
-                classes_path = 'model_data/classes_name.txt',
-                weights_only = True,
-                score = 0.3,
-                iou = 0.3)
-    video_handle = 'model_data/Crossroad.mp4'
-    track_video(yolo,video_handle,det_only = True)
+# if __name__ == '__main__':
+yolo = YOLO(model_path = _current_path + '/model_data/trained_weights_coco.h5',
+            classes_path = _current_path + '/model_data/classes_name.txt',
+            weights_only = True,
+            score = 0.3,
+            iou = 0.3)
+video_handle = _current_path + '/model_data/Crossroad.mp4'
+track_video(yolo,video_handle,det_only = False)
