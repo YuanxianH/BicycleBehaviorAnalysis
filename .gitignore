@@ -12,5 +12,5 @@
 #/stereo_reconstruction/.ipynb_checkpoints/
 */.ipynb_checkpoints/*
 .ipynb_checkpoints
-result
+result/*avi
 project_log.txt

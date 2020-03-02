@@ -92,7 +92,7 @@ class Track:
         self.cat_history = []
         self.cat_bufffer = 25 # the length of car_history is below than 25
 
-        self.XYZ_array = []
+        self.XYZ_array = np.array([])
         self.box_array = []
         self.frame_array = []
 
