@@ -2,6 +2,8 @@
 import numpy as np
 from . import preprocessing
 
+_defaultXYZ = np.reshape(np.array([999,999,999]),(3,1))
+
 class Detection(object):
     """
     This class represents a bounding box detection in a single image.
@@ -12,8 +14,14 @@ class Detection(object):
         Bounding box in format `(x, y, w, h)`.
     confidence : float
         Detector confidence score.
+    object_class: string
+        category
     feature : array_like
         A feature vector that describes the object contained in this image.
+    XYZ : (3,1) np.array
+        The 3d coordination of object
+    frame : int
+        current frame number
 
     Attributes
     ----------
@@ -26,11 +34,20 @@ class Detection(object):
 
     """
 
-    def __init__(self, tlwh, confidence, feature,object_class):
+    def __init__(self, tlwh, confidence, object_class,
+                 feature=None, XYZ=_defaultXYZ, frame=None):
         self.tlwh = np.asarray(tlwh, dtype=np.float)
         self.confidence = float(confidence)
-        self.feature = np.asarray(feature, dtype=np.float32)
         self.object_class = object_class
+        if feature is not None:
+            self.feature = np.asarray(feature, dtype=np.float32)
+        else:
+            self.feature = []
+        # self.feature = np.asarray(feature, dtype=np.float32) if (feature is not None) else []
+        self.frame = frame
+        assert len(XYZ) == 3
+        self.XYZ = np.reshape(np.array(XYZ),(3,1))
+
 
     def to_tlbr(self):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
@@ -48,15 +65,3 @@ class Detection(object):
         ret[:2] += ret[2:] / 2
         ret[2] /= ret[3]
         return ret
-
-def NMS(detections,nms_max_overlap = 1.0):
-    """
-    func:non max suppression
-    tips:boxes should be tlwh format.
-    """
-    boxes = np.array([d.tlwh for d in detections])
-    scores = np.array([d.confidence for d in detections])
-    indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
-    detections = [detections[i] for i in indices]
-
-    return detections

@@ -14,14 +14,21 @@ class Tracker:
 
     Parameters
     ----------
-    metric : nn_matching.NearestNeighborDistanceMetric
+    metric_mode : nn_matching.NearestNeighborDistanceMetric
         A distance metric for measurement-to-track association.
+        It can be "cosine","euclidean" or "combine".
     max_age : int
         Maximum number of missed misses before a track is deleted.
     n_init : int
         Number of consecutive detections before the track is confirmed. The
         track state is set to `Deleted` if a miss occurs within the first
         `n_init` frames.
+    lambda0 : float(0~1)
+        The weight of the Euclidean distance with respect to the cosine distance.
+        If lambda0 = 1, the tracker degrade to SORT. And if lambda0 = 0,
+        the tracker only uses the appearance information.
+    max_distance : float
+
 
     Attributes
     ----------
@@ -44,7 +51,7 @@ class Tracker:
         "n_init": 3,
         "max_distance": 0.3,
         "nn_budget": None,
-        "lambda0":None
+        "lambda0": None
     }
     @classmethod
     def get_defaults(cls,n):
@@ -62,6 +69,7 @@ class Tracker:
 
         self.kf = kalman_filter.KalmanFilter()
         self.tracks = []
+        self.deleted_tracks = []
         self._next_id = 1
 
     def predict(self):
@@ -93,6 +101,10 @@ class Tracker:
             self.tracks[track_idx].mark_missed()
         for detection_idx in unmatched_detections:
             self._initiate_track(detections[detection_idx])
+            
+        for t in self.tracks:
+            if t.is_deleted():
+                self.deleted_tracks.append(t)
         self.tracks = [t for t in self.tracks if not t.is_deleted()]
 
         # Update distance metric.
@@ -111,6 +123,7 @@ class Tracker:
     def _match(self, detections):
 
         def gated_metric(tracks, dets, track_indices, detection_indices):
+
             features = np.array([dets[i].feature for i in detection_indices])
             targets = np.array([tracks[i].track_id for i in track_indices])
             #get cost matrix by computing d(2)
@@ -154,5 +167,6 @@ class Tracker:
         mean, covariance = self.kf.initiate(detection.to_xyah())
         self.tracks.append(Track(
             mean, covariance, self._next_id, self.n_init, self.max_age,
-            detection.feature,detection.object_class))
+            feature = detection.feature,
+            object_class = detection.object_class))
         self._next_id += 1
