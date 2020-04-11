@@ -101,7 +101,7 @@ class Tracker:
             self.tracks[track_idx].mark_missed()
         for detection_idx in unmatched_detections:
             self._initiate_track(detections[detection_idx])
-            
+
         for t in self.tracks:
             if t.is_deleted():
                 self.deleted_tracks.append(t)

@@ -12,8 +12,8 @@ import colorsys
 with open("result/tracking_result.json","r") as f:
     tracks_json = json.load(f)
 
-# dir_path = "/media/yxhuang/database/binocular_video/"
-dir_path = "G:/binocular_video/"
+dir_path = "/media/yxhuang/database/binocular_video/"
+# dir_path = "G:/binocular_video/"
 # 导入拍摄时间
 frame_time = load_frametime(dir_path+"20191022_022500_time.txt")
 # 导入融合数据

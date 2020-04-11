@@ -34,8 +34,7 @@ class Detection(object):
 
     """
 
-    def __init__(self, tlwh, confidence, object_class,
-                 feature=None, XYZ=_defaultXYZ, frame=None):
+    def __init__(self, tlwh, confidence, object_class,info_dict={},feature=None,**kwargs):
         self.tlwh = np.asarray(tlwh, dtype=np.float)
         self.confidence = float(confidence)
         self.object_class = object_class
@@ -44,10 +43,16 @@ class Detection(object):
         else:
             self.feature = []
         # self.feature = np.asarray(feature, dtype=np.float32) if (feature is not None) else []
-        self.frame = frame
-        assert len(XYZ) == 3
-        self.XYZ = np.reshape(np.array(XYZ),(3,1))
+        self.XYZ = _defaultXYZ
 
+        self.frame = 0
+        self.time = 0
+        self.distance = 0
+
+        self.__dict__.update(info_dict)
+        self.__dict__.update(kwargs)
+        assert np.array(self.XYZ).size == 3
+        self.XYZ = np.reshape(np.array(self.XYZ),(3,1))
 
     def to_tlbr(self):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,

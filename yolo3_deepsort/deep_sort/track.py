@@ -1,5 +1,8 @@
 # vim: expandtab:ts=4:sw=4
 import numpy as np
+import sys,os
+sys.path.append(os.path.dirname(__file__) + os.sep + '../')
+from utils.coord_utils import *
 
 class TrackState:
     """
@@ -8,12 +11,35 @@ class TrackState:
     the track state is changed to `confirmed`. Tracks that are no longer alive
     are classified as `deleted` to mark them for removal from the set of active
     tracks.
-
     """
 
     Tentative = 1
     Confirmed = 2
     Deleted = 3
+
+class MotionState:
+    """
+    Pending: 待定
+    Turning: 变向
+    Speedup: 加速
+    Slowdown: 减速
+    UniformLinear: 匀速直线运动
+    """
+    Pending = "Pending"
+    Turning = "Turning"
+    Speedup = "Speed up"
+    Slowdown = "Slow down"
+    UniformLinear = "Uniform Linear"
+
+class SecurityState:
+    """
+    Dangerous: 危险
+    Caution: 小心
+    Safe: 安全
+    """
+    Dangerous = "Dangerous"
+    Caution = "Caution"
+    Safe = "Safe"
 
 
 class Track:
@@ -71,31 +97,44 @@ class Track:
         Record the category of the object
     """
 
+    _defaults = {
+        "montion_buffer": 15,
+        "cat_bufffer": 25
+    }
+
     def __init__(self, mean, covariance, track_id, n_init, max_age,
-                 feature=None,object_class = None):
+                feature = None,**kwargs):
+        self.__dict__.update(self._defaults)
+
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id
-        self.hits = 1
-        self.age = 1
-        self.time_since_update = 0
+        self._n_init = n_init
+        self._max_age = max_age
+        self.object_class = None
+
+        self.XYZ_array = np.array([])
+        self.frame_array = []
+        self.time_array = []
+        self.features = []
+        self.distance = 0
+        self.cat_history = []
 
         self.state = TrackState.Tentative
-        self.features = []
+        self.motion_state = MotionState.Pending
+        self.security_state = SecurityState.Caution
+
         if feature is not None:
             self.features.append(feature)
 
-        self._n_init = n_init
-        self._max_age = max_age
+        self.hits = 1
+        self.age = 1
+        self.time_since_update =0
+        self.velocity = 0
+        self.acceleration = 0
+        self.curvature = 0
 
-        self.object_class = object_class
-        self.cat_history = []
-        self.cat_bufffer = 25 # the length of car_history is below than 25
-
-        self.XYZ_array = np.array([])
-        self.box_array = []
-        self.frame_array = []
-
+        self.__dict__.update(kwargs)
 
     def to_tlwh(self):
         """Get current position in bounding box format `(top left x, top left y,
@@ -163,16 +202,30 @@ class Track:
             self.state = TrackState.Confirmed
 
         self.frame_array.append(detection.frame)
-
+        self.time_array.append(detection.time)
         self.cat_history.append(detection.object_class)
         self.cat_history = self.cat_history[-self.cat_bufffer:]
         self.object_class = max(self.cat_history, key=self.cat_history.count)
 
-        self.box_array.append(self.mean)
         if len(self.XYZ_array) == 0:
             self.XYZ_array = detection.XYZ
         else:
             self.XYZ_array = np.hstack([self.XYZ_array,detection.XYZ])
+
+        self.distance = detection.distance
+        # compute velocity
+        T = self.time_array[-self.montion_buffer:]
+        X = self.XYZ_array[0,-self.montion_buffer:]
+        if len(set(T)) == len(T):# 没有重复的点
+            Y = self.XYZ_array[1,-self.montion_buffer:]
+            Z = self.XYZ_array[2,-self.montion_buffer:]
+
+            _,_,_,self.velocity = computeVelocity(X,Y,Z,np.array(T))
+            _,_,_,self.acceleration = computeAcceleration(X,Y,Z,np.array(T))
+            self.curvature = CSI(X,Y)
+
+        self._update_security_state()
+        self._update_motion_state()
 
     def mark_missed(self):
         """Mark this track as missed (no association at the current time step).
@@ -194,3 +247,11 @@ class Track:
     def is_deleted(self):
         """Returns True if this track is dead and should be deleted."""
         return self.state == TrackState.Deleted
+
+    def _update_security_state(self):
+        """更新安全性"""
+        return 0
+
+    def _update_motion_state(self):
+        """更新运动状态"""
+        return 0

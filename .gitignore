@@ -6,6 +6,7 @@
 /yolo3_deepsort/tools/__pycache__/
 /yolo3_deepsort/yolo3/__pycache__/
 /stereo_reconstruction/__pycache__/
+/utils/__pycache__/
 /stereo_reconstruction/img1/
 /stereo_reconstruction/img2/
 /stereo_reconstruction/*.ipynb
