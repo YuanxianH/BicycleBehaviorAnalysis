@@ -33,8 +33,12 @@ idx_color = {}
 for i,cat in enumerate(class_names):
     idx_color[cat] = int(i)
 
-scalex = 1195450
-scaley = 3376830
+# scalex = 1195450
+# scaley = 3376830
+scalex = 0
+scaley = 0
+x0 = 1195450 - scalex
+y0 = 3376830 - scaley
 X = np.array(fused_data["x"])-scalex
 Y = np.array(fused_data["y"])-scaley
 Z = np.array(fused_data["z"])
@@ -51,10 +55,10 @@ for track in tracks:
 #         print(XYZ_w)
         X_w = XYZ_w[:,0]-scalex
         Y_w = XYZ_w[:,1]-scaley
-        plt.scatter(X_w,Y_w,s=1,color=colors[idx_color[track["category"]]])
+        plt.scatter(X_w,Y_w,s=5,color=colors[idx_color[track["category"]]])
 
 for cat in class_names:
-    plt.scatter([0],[0],s=10,color=colors[idx_color[cat]],label=cat)
+    plt.scatter([x0],[y0],s=10,color=colors[idx_color[cat]],label=cat)
     # plt.plot([0,0.1],[0,0.1],color=colors[idx_color[cat]],label=cat)
 
 plt.title("Trace of Objects and Camera")
